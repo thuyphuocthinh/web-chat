@@ -1,11 +1,11 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-
+import { LoadingReducer } from "./reducers/LoadingReducer";
 const rootReducer = combineReducers({
-  // reducers here
+  LoadingReducer,
 });
 
 const store = configureStore({
-  rootReducer: rootReducer,
+  reducer: rootReducer,
 });
 
 export default store;
