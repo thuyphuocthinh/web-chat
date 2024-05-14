@@ -1,0 +1,324 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  height: 100vh;
+  overflow-y: hidden;
+}
+
+body .home-container {
+  background-color: #282828;
+  color: #fff;
+}
+
+body .home-container .chatList {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+body .home-container .chatList .chatList-header span {
+  width: 35px;
+  height: 35px;
+  background-color: #7b7b7b;
+  border-radius: 50%;
+  padding: 0.4rem;
+  display: block;
+  cursor: pointer;
+}
+
+body .home-container .chatList .chatList-header span img {
+  width: 100%;
+}
+
+body .home-container .chatList .chatList-header span:hover {
+  opacity: 0.8;
+}
+
+body .home-container .chatList .chatList-search,
+body .home-container .chatList .chatList-addUser {
+  position: relative;
+  background-color: #7b7b7b;
+  line-height: 25px;
+  border-radius: 20px;
+  padding: 0.6rem 2rem;
+}
+
+body .home-container .chatList .chatList-search input,
+body .home-container .chatList .chatList-addUser input {
+  background-color: transparent;
+  outline: none;
+  width: 100%;
+}
+
+body .home-container .chatList .chatList-search img,
+body .home-container .chatList .chatList-addUser img {
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+}
+
+body .home-container .chatList .chatList-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+body .home-container .chatList .chatList-main .chatList-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.8rem 0.5rem;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+body .home-container .chatList .chatList-main .chatList-item img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+body .home-container .chatList .chatList-main .chatList-item .chatList-info p {
+  color: #b4b4b4;
+  font-size: 0.8rem;
+}
+
+body .home-container .chatList .chatList-main .chatList-item:hover {
+  background-color: #7b7b7b;
+}
+
+body .home-container .chatList .chatList-footer button {
+  padding: 0.5rem 1rem;
+  width: 100%;
+  background-color: #7b7b7b;
+  border-radius: 10px;
+}
+
+body .home-container .chatList .chatList-footer button:hover {
+  opacity: 0.8;
+}
+
+body .home-container .chatList .chatList-add {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  max-width: 400px;
+  width: 100%;
+  transform: translate(-50%, -50%);
+  background-color: black;
+  padding: 1rem;
+  min-height: 300px;
+  border-radius: 10px;
+}
+
+body .home-container .chatBox {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0.5rem;
+}
+
+body .home-container .chatBox .chatBox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+body .home-container .chatBox .chatBox-header .chatBox-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+body .home-container .chatBox .chatBox-header .chatBox-info img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+body .home-container .chatBox .chatBox-header .chatBox-info p {
+  font-size: 0.8rem;
+  color: #b4b4b4;
+}
+
+body .home-container .chatBox .chatBox-header .chatBox-call {
+  display: flex;
+  gap: 1.5rem;
+}
+
+body .home-container .chatBox .chatBox-header .chatBox-call span {
+  width: 20px;
+  height: 20px;
+  display: block;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+body .home-container .chatBox .chatBox-header .chatBox-call span img {
+  width: 100%;
+}
+
+body .home-container .chatBox .chatBox-header .chatBox-call span:hover {
+  opacity: 0.8;
+}
+
+body .home-container .chatBox .chatBox-main {
+  flex: 1;
+  padding: 0.5rem;
+  overflow-y: auto;
+}
+
+body .home-container .chatBox .chatBox-main .chat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+
+body .home-container .chatBox .chatBox-main .chat img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+body .home-container .chatBox .chatBox-main .chat .chat-content {
+  background-color: #545454;
+  padding: 1rem;
+  border-radius: 10px;
+  min-width: 100px;
+  max-width: 400px;
+}
+
+body .home-container .chatBox .chatBox-main .chatBox-sender {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+body .home-container .chatBox .chatBox-main .chatBox-sender .chat-status {
+  font-size: 0.8rem;
+}
+
+body .home-container .chatBox .chatBox-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+body .home-container .chatBox .chatBox-input div:first-child {
+  display: flex;
+  gap: 1rem;
+}
+
+body .home-container .chatBox .chatBox-input div:first-child img {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+
+body .home-container .chatBox .chatBox-input div:last-child {
+  flex: 1;
+  position: relative;
+}
+
+body .home-container .chatBox .chatBox-input div:last-child input {
+  background-color: #545454;
+  outline: none;
+  padding: 0.5rem 6rem 0.5rem 1rem;
+  border-radius: 10px;
+  width: 100%;
+}
+
+body .home-container .chatBox .chatBox-input div:last-child button {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #282828;
+  padding: 0.2rem 1rem;
+  border-radius: 10px;
+}
+
+body .home-container .chatInfo {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: center;
+}
+
+body .home-container .chatInfo .chatInfo-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+body .home-container .chatInfo .chatInfo-header img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+body .home-container .chatInfo .chatInfo-header div {
+  text-align: center;
+}
+
+body .home-container .chatInfo .chatInfo-header div p {
+  color: #b4b4b4;
+  font-size: 0.8rem;
+}
+
+body .home-container .chatInfo .chatInfo-body {
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+}
+
+body .home-container .chatInfo .chatInfo-body div {
+  padding: 0.8rem 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+body .home-container .chatInfo .chatInfo-body div span {
+  width: 20px;
+  height: 20px;
+}
+
+body .home-container .chatInfo .chatInfo-body div span img {
+  width: 100%;
+}
+
+body .home-container .chatInfo .chatInfo-footer {
+  padding: 0 1rem;
+}
+
+body .home-container .chatInfo .chatInfo-footer button {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: red;
+  border-radius: 10px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+body .home-container .chatInfo .chatInfo-footer button:hover {
+  opacity: 0.8;
+}
+
+@media screen and (max-width: 567px) {
+  body .chatBox .chatBox-main .chat .chat-content {
+    width: 300px;
+  }
+}
+/*# sourceMappingURL=App.css.map */

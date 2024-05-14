@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import WithAuthenticationTemplate from "../../templates/AuthTemplate/AuthTemplate";
 import {
   LockOutlined,
@@ -8,11 +8,34 @@ import {
 } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../libs/firebase";
+import { useDispatch } from "react-redux";
+import { LOG_IN } from "../../redux/actionTypes/UserTypes";
+import { openLoadingAction } from "../../redux/actions/LoadingActions";
 
 function Login() {
   const navigate = useNavigate();
-  const onFinish = (values) => {
-    console.log("Received values of form: ", values);
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const handleLogin = async (values) => {
+    const { email, password } = values;
+    setLoading(true);
+    try {
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      toast.success("Login successfully");
+      dispatch(openLoadingAction());
+      dispatch({
+        type: LOG_IN,
+      });
+      navigate("/");
+    } catch (error) {
+      console.log(">>> Error log in: ", error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className="flex items-center justify-center h-full">
@@ -25,7 +48,7 @@ function Login() {
           initialValues={{
             remember: true,
           }}
-          onFinish={onFinish}
+          onFinish={handleLogin}
         >
           <Form.Item
             name="email"
@@ -70,7 +93,8 @@ function Login() {
               htmlType="submit"
               className="login-form-button w-full"
             >
-              Log in
+              {loading && <i className="fa-solid fa-rotate loading" />}
+              <span className="ml-2">Login</span>
             </Button>
           </Form.Item>
         </Form>

@@ -1,6 +1,10 @@
 import React from "react";
 import { Layout } from "antd";
+import { USER_TOKEN } from "../../settings/system";
+import { useNavigate } from "react-router-dom";
 const { Content, Sider } = Layout;
+
+const UserToken = localStorage.getItem(USER_TOKEN);
 
 function WithAuthenticationTemplate(WrappedComponent) {
   class WithAuthenticationTemplate extends React.Component {

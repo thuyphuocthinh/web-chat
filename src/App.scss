@@ -6,6 +6,7 @@
 body {
     padding: 0;
     height: 100vh;
+    overflow-y: hidden;
     .home-container {
         background-color: #282828;
         color: #fff;
@@ -15,6 +16,13 @@ body {
             flex-direction: column;
             height: 100vh;
             .chatList-header {
+                .chatList-header__info {
+                    img {
+                        width: 45px;
+                        height: 45px;
+                        border-radius: 50%;
+                    }
+                }
                 span {
                     width: 35px;
                     height: 35px;
@@ -75,7 +83,7 @@ body {
                         }
                     }
                     &:hover {
-                        background-color: #7b7b7b;
+                        background-color: #7b7b7b !important;
                     }
                 }
             }
@@ -101,6 +109,33 @@ body {
                 padding: 1rem;
                 min-height: 300px;
                 border-radius: 10px;
+                .chatList-addResult {
+                    &__item {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        div {
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            img {
+                                width: 40px;
+                                height: 40px;
+                                border-radius: 50%;
+                            }
+                        }
+                        button {
+                            background-color: #282828;
+                            color: white;
+                            border-radius: 10px;
+                            padding: 0.5rem;
+                            cursor: pointer;
+                            &:hover {
+                                opacity: 0.8;
+                            }
+                        }
+                    }
+                }
             }
         }
         .chatBox {
@@ -108,6 +143,8 @@ body {
             flex-direction: column;
             height: 100vh;
             padding: 0.5rem;
+            border-right: 1px solid #545454;
+            border-left: 1px solid #545454;
             .chatBox-header {
                 display: flex;
                 justify-content: space-between;
@@ -170,6 +207,9 @@ body {
                 .chatBox-sender {
                     flex-direction: column;
                     align-items: flex-end;
+                    .chat-content {
+                        background-color: #1a1a1a !important;
+                    }
                     .chat-status {
                         font-size: 0.8rem;
                     }
@@ -187,10 +227,17 @@ body {
                         height: 25px;
                         cursor: pointer;
                     }
+                    .emoji {
+                        position: absolute !important;
+                        bottom: 3rem;
+                        z-index: 5;
+                        left: 0;
+                    }
                 }
                 div:last-child {
                     flex: 1;
                     position: relative;
+
                     input {
                         background-color: #545454;
                         outline: none;
@@ -264,6 +311,33 @@ body {
                         opacity: 0.8;
                     }
                 }
+            }
+        }
+    }
+    .App {
+        @keyframes animName {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .loading {
+            animation: animName 2s linear infinite;
+        }
+        .loadingGif {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            img {
+                width: 150px;
             }
         }
     }

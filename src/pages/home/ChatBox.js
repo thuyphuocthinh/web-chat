@@ -1,15 +1,136 @@
-import React from "react";
+import {
+  arrayUnion,
+  doc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { db } from "../../libs/firebase";
+import EmojiPicker from "emoji-picker-react";
 
 export default function ChatBox() {
+  const autoScrollRef = useRef(null);
+  const { chatId, user } = useSelector((state) => state.ChatReducer);
+  const { currentUser } = useSelector((state) => state.UserReducer);
+  const [chat, setChat] = useState([]);
+  const [text, setText] = useState("");
+  const [openEmoji, setOpenEmoji] = useState(false);
+  useEffect(() => {
+    if (autoScrollRef.current) {
+      autoScrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!chatId) return;
+
+    const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+      setChat(res.data());
+    });
+
+    return () => {
+      unSub();
+    };
+  }, [chatId]);
+
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setText(value);
+  };
+
+  const handleEmoji = (e) => {
+    const { emoji } = e;
+    setText((prev) => prev + emoji);
+  };
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    try {
+      if (text === "") return;
+      await updateDoc(doc(db, "chats", chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.id,
+          text,
+          createdAt: new Date(),
+        }),
+      });
+
+      const userIds = [currentUser.id, user.id];
+
+      userIds.forEach(async (id) => {
+        const userChatsRef = doc(db, "userChats", id);
+        const userChatsSnapshot = await getDoc(userChatsRef);
+
+        if (userChatsSnapshot.exists()) {
+          const userChatsData = userChatsSnapshot.data();
+
+          const chatIndex = userChatsData.chats.findIndex(
+            (c) => c.chatId === chatId
+          );
+
+          userChatsData.chats[chatIndex].lastMessage = text;
+          userChatsData.chats[chatIndex].isSeen =
+            id === currentUser.id ? true : false;
+          userChatsData.chats[chatIndex].updatedAt = Date.now();
+
+          await updateDoc(userChatsRef, {
+            chats: userChatsData.chats,
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setText("");
+    }
+  };
+
+  const renderChat = () => {
+    return chat.messages?.map((message) => {
+      return (
+        <div
+          className={`chat ${
+            message.senderId === currentUser.id
+              ? "chatBox-sender"
+              : "chatBox-receiver"
+          }`}
+          key={message.createdAt}
+        >
+          {message.senderId === currentUser.id ? (
+            <p className="chat-content">{message.text}</p>
+          ) : (
+            <div className="flex items-center gap-2">
+              <img
+                src={user?.avatar || require("../../assets/img/avatar.png")}
+                alt="avatar"
+                style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+              />
+              <p className="chat-content">{message.text}</p>
+            </div>
+          )}
+          {message.senderId === currentUser.id ? (
+            <p className="chat-status">Sent</p>
+          ) : (
+            ""
+          )}
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="chatBox">
       {/* ChatBoxHeader */}
       <div className="chatBox-header">
         <div className="chatBox-info">
-          <img src={require("../../assets/img/avatar.png")} alt="avatar" />
+          <img
+            src={user?.avatar || require("../../assets/img/avatar.png")}
+            alt="avatar"
+          />
           <div>
-            <h3>Tran Phuoc Quan</h3>
-            <p>Active 50m ago</p>
+            <h3>{user?.username}</h3>
           </div>
         </div>
         <div className="chatBox-call">
@@ -29,82 +150,38 @@ export default function ChatBox() {
       </div>
       {/* ChatBox */}
       <div className="chatBox-main my-4">
-        <div className="chat chatBox-sender">
-          <p className="chat-content">Hello, How are you?</p>
-          <p className="chat-status">Sent</p>
-        </div>
-        <div className="chat chatBox-receiver">
-          <img src={require("../../assets/img/avatar.png")} alt="avatar" />
-          <div>
-            <p className="chat-content">Hello, How are you?</p>
-          </div>
-        </div>
-        <div className="chat chatBox-sender">
-          <p className="chat-content">Hello, How are you?</p>
-          <p className="chat-status">Sent</p>
-        </div>
-        <div className="chat chatBox-receiver">
-          <img src={require("../../assets/img/avatar.png")} alt="avatar" />
-          <div>
-            <p className="chat-content">Hello, How are you?</p>
-          </div>
-        </div>
-        <div className="chat chatBox-sender">
-          <p className="chat-content">Hello, How are you?</p>
-          <p className="chat-status">Sent</p>
-        </div>
-        <div className="chat chatBox-receiver">
-          <img src={require("../../assets/img/avatar.png")} alt="avatar" />
-          <div>
-            <p className="chat-content">Hello, How are you?</p>
-          </div>
-        </div>
-        <div className="chat chatBox-sender">
-          <p className="chat-content">Hello, How are you?</p>
-          <p className="chat-status">Sent</p>
-        </div>
-        <div className="chat chatBox-receiver">
-          <img src={require("../../assets/img/avatar.png")} alt="avatar" />
-          <div>
-            <p className="chat-content">Hello, How are you?</p>
-          </div>
-        </div>
-        <div className="chat chatBox-sender">
-          <p className="chat-content">
-            Sơn Án là một chòm sao mờ nằm gần thiên cực nam. Đây là một trong 18
-            chòm sao được nhà thiên văn học người Pháp Nicolas-Louis de Lacaille
-            đề xuất vào thế kỷ 18 và là một trong 88 chòm sao được Liên đoàn
-            Thiên văn Quốc tế công nhận. Tên Latinh của Sơn Án có nghĩa là 'cái
-            bàn', mặc dù ban đầu chòm sao này đại diện cho núi Bàn và được gọi
-            là Mons Mensae. Chòm sao này bao phủ một khu vực có hình đá đỉnh vòm
-            với diện tích 153,5 độ vuông. Nếu không tính chòm sao Nam Cực thì
-            đây là chòm sao gần thiên cực nam nhất, vốn chỉ có thể quan sát được
-            từ phía nam vĩ tuyến 5°B.
-          </p>
-          <p className="chat-status">Sent</p>
-        </div>
-        <div className="chat chatBox-receiver">
-          <img src={require("../../assets/img/avatar.png")} alt="avatar" />
-          <div>
-            <p className="chat-content">Hello, How are you?</p>
-          </div>
-        </div>
+        {renderChat()}
+        <div ref={autoScrollRef}></div>
       </div>
+
       {/* ChatBoxInput */}
       <div className="chatBox-input">
         <div>
           <img src={require("../../assets/img/img.png")} alt="img" />
-          <img src={require("../../assets/img/emoji.png")} alt="emoji" />
+          <div className="relative">
+            <img
+              src={require("../../assets/img/emoji.png")}
+              alt="emoji"
+              onClick={() => setOpenEmoji(!openEmoji)}
+            />
+            <div className="emoji">
+              <EmojiPicker open={openEmoji} onEmojiClick={handleEmoji} />
+            </div>
+          </div>
           <img src={require("../../assets/img/mic.png")} alt="mic" />
         </div>
         <div>
-          <input
-            type="text"
-            autoComplete="false"
-            placeholder="Type messages..."
-            name="message"
-          />
-          <button>Send</button>
+          <form onSubmit={handleSend}>
+            <input
+              type="text"
+              autoComplete="false"
+              placeholder="Type messages..."
+              name="message"
+              value={text}
+              onChange={handleChange}
+            />
+            <button>Send</button>
+          </form>
         </div>
       </div>
     </div>

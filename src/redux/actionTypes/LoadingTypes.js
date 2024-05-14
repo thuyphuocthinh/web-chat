@@ -1,0 +1,2 @@
+export const OPEN_LOADING = "OPEN_LOADING";
+export const HIDE_LOADING = "HIDE_LOADING";
