@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { db } from "../../libs/firebase";
 import EmojiPicker from "emoji-picker-react";
+import upload from "../../libs/upload";
 
 export default function ChatBox() {
   const autoScrollRef = useRef(null);
@@ -17,6 +18,11 @@ export default function ChatBox() {
   const [chat, setChat] = useState([]);
   const [text, setText] = useState("");
   const [openEmoji, setOpenEmoji] = useState(false);
+  const [img, setImg] = useState({
+    file: null,
+    url: "",
+  });
+  const [showLoadingImg, setShowLoadingImg] = useState(false);
   useEffect(() => {
     if (autoScrollRef.current) {
       autoScrollRef.current.scrollIntoView({ behavior: "smooth" });
@@ -35,6 +41,17 @@ export default function ChatBox() {
     };
   }, [chatId]);
 
+  const handleImg = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imgUrl = URL.createObjectURL(file);
+      setImg({
+        file: file,
+        url: imgUrl,
+      });
+    }
+  };
+
   const handleChange = (e) => {
     const { value } = e.target;
     setText(value);
@@ -48,42 +65,54 @@ export default function ChatBox() {
   const handleSend = async (e) => {
     e.preventDefault();
     try {
-      if (text === "") return;
-      await updateDoc(doc(db, "chats", chatId), {
-        messages: arrayUnion({
-          senderId: currentUser.id,
-          text,
-          createdAt: new Date(),
-        }),
-      });
-
-      const userIds = [currentUser.id, user.id];
-
-      userIds.forEach(async (id) => {
-        const userChatsRef = doc(db, "userChats", id);
-        const userChatsSnapshot = await getDoc(userChatsRef);
-
-        if (userChatsSnapshot.exists()) {
-          const userChatsData = userChatsSnapshot.data();
-
-          const chatIndex = userChatsData.chats.findIndex(
-            (c) => c.chatId === chatId
-          );
-
-          userChatsData.chats[chatIndex].lastMessage = text;
-          userChatsData.chats[chatIndex].isSeen =
-            id === currentUser.id ? true : false;
-          userChatsData.chats[chatIndex].updatedAt = Date.now();
-
-          await updateDoc(userChatsRef, {
-            chats: userChatsData.chats,
-          });
+      setShowLoadingImg(true);
+      if (text === "" || img.file) {
+        let imgUrl = null;
+        if (img.file) {
+          imgUrl = await upload(img.file);
         }
-      });
+
+        await updateDoc(doc(db, "chats", chatId), {
+          messages: arrayUnion({
+            senderId: currentUser.id,
+            text,
+            createdAt: new Date(),
+            ...(imgUrl && { img: imgUrl }),
+          }),
+        });
+
+        const userIds = [currentUser.id, user.id];
+        userIds.forEach(async (id) => {
+          const userChatsRef = doc(db, "userChats", id);
+          const userChatsSnapshot = await getDoc(userChatsRef);
+
+          if (userChatsSnapshot.exists()) {
+            const userChatsData = userChatsSnapshot.data();
+
+            const chatIndex = userChatsData.chats.findIndex(
+              (c) => c.chatId === chatId
+            );
+
+            userChatsData.chats[chatIndex].lastMessage = text;
+            userChatsData.chats[chatIndex].isSeen =
+              id === currentUser.id ? true : false;
+            userChatsData.chats[chatIndex].updatedAt = Date.now();
+
+            await updateDoc(userChatsRef, {
+              chats: userChatsData.chats,
+            });
+          }
+        });
+      }
     } catch (error) {
       console.log(error);
     } finally {
       setText("");
+      setImg({
+        file: null,
+        url: "",
+      });
+      setShowLoadingImg(false);
     }
   };
 
@@ -99,19 +128,42 @@ export default function ChatBox() {
           key={message.createdAt}
         >
           {message.senderId === currentUser.id ? (
-            <p className="chat-content">{message.text}</p>
-          ) : (
-            <div className="flex items-center gap-2">
-              <img
-                src={user?.avatar || require("../../assets/img/avatar.png")}
-                alt="avatar"
-                style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-              />
+            message.text === "" ? (
+              ""
+            ) : (
               <p className="chat-content">{message.text}</p>
-            </div>
+            )
+          ) : (
+            <>
+              <div className="flex items-center gap-2">
+                <img
+                  src={user?.avatar || require("../../assets/img/avatar.png")}
+                  alt="avatar"
+                  style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+                />
+                <div className="flex flex-col gap-2">
+                  {message.text === "" ? (
+                    ""
+                  ) : (
+                    <p className="chat-content">{message.text}</p>
+                  )}
+
+                  <div className="chat-img">
+                    <img
+                      src={message.img}
+                      alt={message.img}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </>
           )}
+
           {message.senderId === currentUser.id ? (
-            <p className="chat-status">Sent</p>
+            <div className="chat-img">
+              <img src={message.img} alt={message.img} className="w-full" />
+            </div>
           ) : (
             ""
           )}
@@ -151,13 +203,35 @@ export default function ChatBox() {
       {/* ChatBox */}
       <div className="chatBox-main my-4">
         {renderChat()}
+
+        {showLoadingImg ? (
+          <div className="chat chatBox-sender">
+            <div className="chat-img">
+              <img
+                src={require("../../assets/img/Loading.gif")}
+                className="w-full"
+              />
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+
         <div ref={autoScrollRef}></div>
       </div>
 
       {/* ChatBoxInput */}
       <div className="chatBox-input">
         <div>
-          <img src={require("../../assets/img/img.png")} alt="img" />
+          <label htmlFor="img">
+            <img src={require("../../assets/img/img.png")} alt="img" />
+          </label>
+          <input
+            type="file"
+            id="img"
+            style={{ display: "none" }}
+            onChange={handleImg}
+          />
           <div className="relative">
             <img
               src={require("../../assets/img/emoji.png")}

@@ -71,7 +71,7 @@ export default function ChatList(props) {
 
     const chatIndex = userChats.findIndex(
       (item) => item.chatId === chat.chatId
-    );
+    );  
     userChats[chatIndex].isSeen = true;
     const usersChatRef = doc(db, "userChats", currentUser.id);
 
